@@ -4,16 +4,7 @@ namespace LinqConsoleLab.PL.Exercises;
 
 public sealed class ZadaniaLinq
 {
-    /// <summary>
-    /// Zadanie:
-    /// Wyszukaj wszystkich studentów mieszkających w Warsaw.
-    /// Zwróć numer indeksu, pełne imię i nazwisko oraz miasto.
-    ///
-    /// SQL:
-    /// SELECT NumerIndeksu, Imie, Nazwisko, Miasto
-    /// FROM Studenci
-    /// WHERE Miasto = 'Warsaw';
-    /// </summary>
+    
     public IEnumerable<string> Zadanie01_StudenciZWarszawy()
     {
         return DaneUczelni.Studenci
@@ -21,31 +12,14 @@ public sealed class ZadaniaLinq
             .Select(s => $"{s.NumerIndeksu} | {s.Imie} {s.Nazwisko} | {s.Miasto}");
     }
 
-    /// <summary>
-    /// Zadanie:
-    /// Przygotuj listę adresów e-mail wszystkich studentów.
-    /// Użyj projekcji, tak aby w wyniku nie zwracać całych obiektów.
-    ///
-    /// SQL:
-    /// SELECT Email
-    /// FROM Studenci;
-    /// </summary>
+   
     public IEnumerable<string> Zadanie02_AdresyEmailStudentow()
     {
         return DaneUczelni.Studenci
             .Select(s => s.Email);
     }
 
-    /// <summary>
-    /// Zadanie:
-    /// Posortuj studentów alfabetycznie po nazwisku, a następnie po imieniu.
-    /// Zwróć numer indeksu i pełne imię i nazwisko.
-    ///
-    /// SQL:
-    /// SELECT NumerIndeksu, Imie, Nazwisko
-    /// FROM Studenci
-    /// ORDER BY Nazwisko, Imie;
-    /// </summary>
+    
     public IEnumerable<string> Zadanie03_StudenciPosortowani()
     {
         return DaneUczelni.Studenci
@@ -54,16 +28,7 @@ public sealed class ZadaniaLinq
             .Select(s => $"{s.NumerIndeksu} | {s.Imie} {s.Nazwisko}");
     }
 
-    /// <summary>
-    /// Zadanie:
-    /// Znajdź pierwszy przedmiot z kategorii Analytics.
-    /// Jeżeli taki przedmiot nie istnieje, zwróć komunikat tekstowy.
-    ///
-    /// SQL:
-    /// SELECT TOP 1 Nazwa, DataStartu
-    /// FROM Przedmioty
-    /// WHERE Kategoria = 'Analytics';
-    /// </summary>
+   
     public IEnumerable<string> Zadanie04_PierwszyPrzedmiotAnalityczny()
     {
         var przedmiot = DaneUczelni.Przedmioty
@@ -91,7 +56,10 @@ public sealed class ZadaniaLinq
     /// </summary>
     public IEnumerable<string> Zadanie05_CzyIstniejeNieaktywneZapisanie()
     {
-        throw Niezaimplementowano(nameof(Zadanie05_CzyIstniejeNieaktywneZapisanie));
+        var istnieje = DaneUczelni.Zapisy
+            .Any(z => !z.CzyAktywny);
+
+        return [$"Czy istnieje nieaktywne zapisanie: {(istnieje ? "Tak" : "Nie")}"];
     }
 
     /// <summary>
@@ -106,7 +74,10 @@ public sealed class ZadaniaLinq
     /// </summary>
     public IEnumerable<string> Zadanie06_CzyWszyscyProwadzacyMajaKatedre()
     {
-        throw Niezaimplementowano(nameof(Zadanie06_CzyWszyscyProwadzacyMajaKatedre));
+        var wszyscyMajaKatedre = DaneUczelni.Prowadzacy
+            .All(p => !string.IsNullOrWhiteSpace(p.Katedra));
+
+        return [$"Czy wszyscy prowadzący mają katedrę: {(wszyscyMajaKatedre ? "Tak" : "Nie")}"];
     }
 
     /// <summary>
@@ -120,7 +91,10 @@ public sealed class ZadaniaLinq
     /// </summary>
     public IEnumerable<string> Zadanie07_LiczbaAktywnychZapisow()
     {
-        throw Niezaimplementowano(nameof(Zadanie07_LiczbaAktywnychZapisow));
+        var liczba = DaneUczelni.Zapisy
+            .Count(z => z.CzyAktywny);
+
+        return [$"Liczba aktywnych zapisów: {liczba}"];
     }
 
     /// <summary>
@@ -134,7 +108,10 @@ public sealed class ZadaniaLinq
     /// </summary>
     public IEnumerable<string> Zadanie08_UnikalneMiastaStudentow()
     {
-        throw Niezaimplementowano(nameof(Zadanie08_UnikalneMiastaStudentow));
+        return DaneUczelni.Studenci
+            .Select(s => s.Miasto)
+            .Distinct()
+            .OrderBy(m => m);
     }
 
     /// <summary>
