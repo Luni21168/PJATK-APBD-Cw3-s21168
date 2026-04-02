@@ -125,69 +125,69 @@ public sealed class ZadaniaLinq
             );
     }
 
-    /// <summary>
-    /// Zadanie:
-    /// Pogrupuj zapisy według przedmiotu i zwróć nazwę przedmiotu oraz liczbę zapisów.
-    ///
-    /// SQL:
-    /// SELECT p.Nazwa, COUNT(*)
-    /// FROM Zapisy z
-    /// JOIN Przedmioty p ON p.Id = z.PrzedmiotId
-    /// GROUP BY p.Nazwa;
-    /// </summary>
+    
     public IEnumerable<string> Zadanie13_GrupowanieZapisowWedlugPrzedmiotu()
     {
-        throw Niezaimplementowano(nameof(Zadanie13_GrupowanieZapisowWedlugPrzedmiotu));
+        return DaneUczelni.Zapisy
+            .Join(
+                DaneUczelni.Przedmioty,
+                zapis => zapis.PrzedmiotId,
+                przedmiot => przedmiot.Id,
+                (zapis, przedmiot) => przedmiot.Nazwa
+            )
+            .GroupBy(nazwa => nazwa)
+            .Select(g => $"{g.Key} | liczba zapisów: {g.Count()}");
     }
 
-    /// <summary>
-    /// Zadanie:
-    /// Oblicz średnią ocenę końcową dla każdego przedmiotu.
-    /// Pomiń rekordy, w których ocena końcowa ma wartość null.
-    ///
-    /// SQL:
-    /// SELECT p.Nazwa, AVG(z.OcenaKoncowa)
-    /// FROM Zapisy z
-    /// JOIN Przedmioty p ON p.Id = z.PrzedmiotId
-    /// WHERE z.OcenaKoncowa IS NOT NULL
-    /// GROUP BY p.Nazwa;
-    /// </summary>
+    
     public IEnumerable<string> Zadanie14_SredniaOcenaNaPrzedmiot()
     {
-        throw Niezaimplementowano(nameof(Zadanie14_SredniaOcenaNaPrzedmiot));
+        return DaneUczelni.Zapisy
+            .Where(z => z.OcenaKoncowa.HasValue)
+            .Join(
+                DaneUczelni.Przedmioty,
+                zapis => zapis.PrzedmiotId,
+                przedmiot => przedmiot.Id,
+                (zapis, przedmiot) => new
+                {
+                    przedmiot.Nazwa,
+                    Ocena = zapis.OcenaKoncowa!.Value
+                }
+            )
+            .GroupBy(x => x.Nazwa)
+            .Select(g => $"{g.Key} | średnia ocena: {g.Average(x => x.Ocena):0.00}");
     }
 
-    /// <summary>
-    /// Zadanie:
-    /// Dla każdego prowadzącego policz liczbę przypisanych przedmiotów.
-    /// W wyniku zwróć pełne imię i nazwisko oraz liczbę przedmiotów.
-    ///
-    /// SQL:
-    /// SELECT pr.Imie, pr.Nazwisko, COUNT(p.Id)
-    /// FROM Prowadzacy pr
-    /// LEFT JOIN Przedmioty p ON p.ProwadzacyId = pr.Id
-    /// GROUP BY pr.Imie, pr.Nazwisko;
-    /// </summary>
+   
     public IEnumerable<string> Zadanie15_ProwadzacyILiczbaPrzedmiotow()
     {
-        throw Niezaimplementowano(nameof(Zadanie15_ProwadzacyILiczbaPrzedmiotow));
+        return DaneUczelni.Prowadzacy
+            .GroupJoin(
+                DaneUczelni.Przedmioty,
+                prowadzacy => prowadzacy.Id,
+                przedmiot => przedmiot.ProwadzacyId,
+                (prowadzacy, przedmioty) =>
+                    $"{prowadzacy.Imie} {prowadzacy.Nazwisko} | liczba przedmiotów: {przedmioty.Count()}"
+            );
     }
 
-    /// <summary>
-    /// Zadanie:
-    /// Dla każdego studenta znajdź jego najwyższą ocenę końcową.
-    /// Pomiń studentów, którzy nie mają jeszcze żadnej oceny.
-    ///
-    /// SQL:
-    /// SELECT s.Imie, s.Nazwisko, MAX(z.OcenaKoncowa)
-    /// FROM Studenci s
-    /// JOIN Zapisy z ON s.Id = z.StudentId
-    /// WHERE z.OcenaKoncowa IS NOT NULL
-    /// GROUP BY s.Imie, s.Nazwisko;
-    /// </summary>
+    
     public IEnumerable<string> Zadanie16_NajwyzszaOcenaKazdegoStudenta()
     {
-        throw Niezaimplementowano(nameof(Zadanie16_NajwyzszaOcenaKazdegoStudenta));
+        return DaneUczelni.Studenci
+            .Join(
+                DaneUczelni.Zapisy.Where(z => z.OcenaKoncowa.HasValue),
+                student => student.Id,
+                zapis => zapis.StudentId,
+                (student, zapis) => new
+                {
+                    student.Imie,
+                    student.Nazwisko,
+                    Ocena = zapis.OcenaKoncowa!.Value
+                }
+            )
+            .GroupBy(x => new { x.Imie, x.Nazwisko })
+            .Select(g => $"{g.Key.Imie} {g.Key.Nazwisko} | najwyższa ocena: {g.Max(x => x.Ocena):0.0}");
     }
 
     /// <summary>
