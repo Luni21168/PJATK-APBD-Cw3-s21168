@@ -42,18 +42,7 @@ public sealed class ZadaniaLinq
         return [$"{przedmiot.Nazwa} | start: {przedmiot.DataStartu:yyyy-MM-dd}"];
     }
 
-    /// <summary>
-    /// Zadanie:
-    /// Sprawdź, czy w danych istnieje przynajmniej jeden nieaktywny zapis.
-    /// Zwróć jedno zdanie z odpowiedzią True/False albo Tak/Nie.
-    ///
-    /// SQL:
-    /// SELECT CASE WHEN EXISTS (
-    ///     SELECT 1
-    ///     FROM Zapisy
-    ///     WHERE CzyAktywny = 0
-    /// ) THEN 1 ELSE 0 END;
-    /// </summary>
+
     public IEnumerable<string> Zadanie05_CzyIstniejeNieaktywneZapisanie()
     {
         var istnieje = DaneUczelni.Zapisy
@@ -62,16 +51,7 @@ public sealed class ZadaniaLinq
         return [$"Czy istnieje nieaktywne zapisanie: {(istnieje ? "Tak" : "Nie")}"];
     }
 
-    /// <summary>
-    /// Zadanie:
-    /// Sprawdź, czy każdy prowadzący ma uzupełnioną nazwę katedry.
-    /// Warto użyć metody, która weryfikuje warunek dla całej kolekcji.
-    ///
-    /// SQL:
-    /// SELECT CASE WHEN COUNT(*) = COUNT(Katedra)
-    /// THEN 1 ELSE 0 END
-    /// FROM Prowadzacy;
-    /// </summary>
+   
     public IEnumerable<string> Zadanie06_CzyWszyscyProwadzacyMajaKatedre()
     {
         var wszyscyMajaKatedre = DaneUczelni.Prowadzacy
@@ -80,15 +60,7 @@ public sealed class ZadaniaLinq
         return [$"Czy wszyscy prowadzący mają katedrę: {(wszyscyMajaKatedre ? "Tak" : "Nie")}"];
     }
 
-    /// <summary>
-    /// Zadanie:
-    /// Policz, ile aktywnych zapisów znajduje się w systemie.
-    ///
-    /// SQL:
-    /// SELECT COUNT(*)
-    /// FROM Zapisy
-    /// WHERE CzyAktywny = 1;
-    /// </summary>
+  
     public IEnumerable<string> Zadanie07_LiczbaAktywnychZapisow()
     {
         var liczba = DaneUczelni.Zapisy
@@ -97,15 +69,7 @@ public sealed class ZadaniaLinq
         return [$"Liczba aktywnych zapisów: {liczba}"];
     }
 
-    /// <summary>
-    /// Zadanie:
-    /// Pobierz listę unikalnych miast studentów i posortuj ją rosnąco.
-    ///
-    /// SQL:
-    /// SELECT DISTINCT Miasto
-    /// FROM Studenci
-    /// ORDER BY Miasto;
-    /// </summary>
+   
     public IEnumerable<string> Zadanie08_UnikalneMiastaStudentow()
     {
         return DaneUczelni.Studenci
@@ -114,66 +78,51 @@ public sealed class ZadaniaLinq
             .OrderBy(m => m);
     }
 
-    /// <summary>
-    /// Zadanie:
-    /// Zwróć trzy najnowsze zapisy na przedmioty.
-    /// W wyniku pokaż datę zapisu, identyfikator studenta i identyfikator przedmiotu.
-    ///
-    /// SQL:
-    /// SELECT TOP 3 DataZapisu, StudentId, PrzedmiotId
-    /// FROM Zapisy
-    /// ORDER BY DataZapisu DESC;
-    /// </summary>
+    
     public IEnumerable<string> Zadanie09_TrzyNajnowszeZapisy()
     {
-        throw Niezaimplementowano(nameof(Zadanie09_TrzyNajnowszeZapisy));
+        return DaneUczelni.Zapisy
+            .OrderByDescending(z => z.DataZapisu)
+            .Take(3)
+            .Select(z => $"{z.DataZapisu:yyyy-MM-dd} | StudentId: {z.StudentId} | PrzedmiotId: {z.PrzedmiotId}");
     }
 
-    /// <summary>
-    /// Zadanie:
-    /// Zaimplementuj prostą paginację dla listy przedmiotów.
-    /// Załóż stronę o rozmiarze 2 i zwróć drugą stronę danych.
-    ///
-    /// SQL:
-    /// SELECT Nazwa, Kategoria
-    /// FROM Przedmioty
-    /// ORDER BY Nazwa
-    /// OFFSET 2 ROWS FETCH NEXT 2 ROWS ONLY;
-    /// </summary>
+ 
     public IEnumerable<string> Zadanie10_DrugaStronaPrzedmiotow()
     {
-        throw Niezaimplementowano(nameof(Zadanie10_DrugaStronaPrzedmiotow));
+        return DaneUczelni.Przedmioty
+            .OrderBy(p => p.Nazwa)
+            .Skip(2)
+            .Take(2)
+            .Select(p => $"{p.Nazwa} | {p.Kategoria}");
     }
 
-    /// <summary>
-    /// Zadanie:
-    /// Połącz studentów z zapisami po StudentId.
-    /// Zwróć pełne imię i nazwisko studenta oraz datę zapisu.
-    ///
-    /// SQL:
-    /// SELECT s.Imie, s.Nazwisko, z.DataZapisu
-    /// FROM Studenci s
-    /// JOIN Zapisy z ON s.Id = z.StudentId;
-    /// </summary>
+   
     public IEnumerable<string> Zadanie11_PolaczStudentowIZapisy()
     {
-        throw Niezaimplementowano(nameof(Zadanie11_PolaczStudentowIZapisy));
+        return DaneUczelni.Studenci
+            .Join(
+                DaneUczelni.Zapisy,
+                student => student.Id,
+                zapis => zapis.StudentId,
+                (student, zapis) => $"{student.Imie} {student.Nazwisko} | data zapisu: {zapis.DataZapisu:yyyy-MM-dd}"
+            );
     }
 
-    /// <summary>
-    /// Zadanie:
-    /// Przygotuj wszystkie pary student-przedmiot na podstawie zapisów.
-    /// Użyj podejścia, które pozwoli spłaszczyć dane do jednej sekwencji wyników.
-    ///
-    /// SQL:
-    /// SELECT s.Imie, s.Nazwisko, p.Nazwa
-    /// FROM Zapisy z
-    /// JOIN Studenci s ON s.Id = z.StudentId
-    /// JOIN Przedmioty p ON p.Id = z.PrzedmiotId;
-    /// </summary>
+    
     public IEnumerable<string> Zadanie12_ParyStudentPrzedmiot()
     {
-        throw Niezaimplementowano(nameof(Zadanie12_ParyStudentPrzedmiot));
+        return DaneUczelni.Studenci
+            .SelectMany(
+                student => DaneUczelni.Zapisy
+                    .Where(z => z.StudentId == student.Id)
+                    .Join(
+                        DaneUczelni.Przedmioty,
+                        zapis => zapis.PrzedmiotId,
+                        przedmiot => przedmiot.Id,
+                        (zapis, przedmiot) => $"{student.Imie} {student.Nazwisko} | {przedmiot.Nazwa}"
+                    )
+            );
     }
 
     /// <summary>
